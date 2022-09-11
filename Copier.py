@@ -4,7 +4,7 @@ import threading
 # python3.9 -m pip install pyperclip
 # python3.9 -m pip uninstall pyperclip
 import pyperclip
-from PublicTools import FileH, MemoryKey, g_memoryDict
+from PublicTools import FileH, MemoryKey, g_memoryDict, MemoryDictController
 
 
 class Copier(threading.Thread):
@@ -29,19 +29,29 @@ class Copier(threading.Thread):
         self._stopping = True
 
 
+WriteStat = {"writingTimes": 0, "charsCount": 0}
+
+
 def SaveToInTime(pth: str, contents: str) -> bool:
     if not pth or not contents:
         return False
     with open(file=pth, mode="a", encoding="UTF-8") as f:
         f.write(contents)
+
+    nChar = len(contents)
+    WriteStat["writingTimes"] += 1
+    WriteStat["charsCount"] += nChar
+    print(f'''WriteTimes { WriteStat["writingTimes"] }, {nChar} chars writed''')
     return True
 
-def GetTextSaveToAbsPath()->str:
+
+def GetTextSaveToAbsPath() -> str:
     textSaveTo = g_memoryDict[MemoryKey.TEXT_SAVE_TO_DEFAULT_PATH.name]
     textBaseName = FileH.GetTextNamedTimeStamps()
     textAbsPath = os.path.join(textSaveTo, FileH.JoinBaseNameFormat(textBaseName, "txt"))
     FileH.touchByAbsPath(textAbsPath)
     return textAbsPath
+
 
 def main():
     FileH.ReadFromJsonFile()
@@ -49,16 +59,20 @@ def main():
     textAbsPath = GetTextSaveToAbsPath()
     watcher = Copier(SaveToInTime, sleepTime, textAbsPath)
     watcher.start()
-    while True:
-        try:
-            print("Monitoring...")
-            time.sleep(10)
-        except KeyboardInterrupt:
-            watcher.stop()
-            break
-        finally:
-            FileH.WriteIntoJsonFile()
-    return
+
+    MemoryDictController.Display()
+    msg = "Input index|nvalue, exit(q) to quit\n"
+    hint = str()
+    while hint != 'q':
+        hint = input(msg)
+        inputLst = hint.split("|")
+        if len(inputLst) != 2:
+            print("input invalid, mod abort")
+            continue
+        setRet = MemoryDictController.SetValueInIndex(inputLst[0], inputLst[1])
+    watcher.stop()
+    FileH.WriteIntoJsonFile()
+    print(f"Contents have write into [{textAbsPath}]. {WriteStat}")
 
 
 if __name__ == "__main__":

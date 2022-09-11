@@ -1,3 +1,4 @@
+from curses.ascii import isdigit
 import os
 import sys
 import json
@@ -16,6 +17,36 @@ class MemoryKey(enum.Enum):
 
 
 g_memoryDict = {v.name: v.value for _, v in MemoryKey.__members__.items()}
+
+
+class MemoryDictController:
+    def Display():
+        i = 0
+        for k, v in MemoryKey.__members__.items():
+            print(f"{i}. {k} {g_memoryDict[k]}|{v.value}")
+            i += 1
+
+    def SetValueInIndex(ind: str, newValue: str) -> bool:
+        if not ind.isnumeric():
+            return False
+        ind = int(ind)
+
+        if not (0 <= ind < len(MemoryKey)):
+            raise IndexError(f"{ind} must in [0, {len(MemoryKey)})")
+        i = 0
+        for k, _ in MemoryKey.__members__.items():
+            if i == ind:
+                beforeType = type(g_memoryDict[k])
+                try:
+                    g_memoryDict[k] = beforeType(newValue)
+                except ValueError:
+                    print(f"Input Must be type of {beforeType}. it cannot not converted from str")
+                    return False
+                break
+            i += 1
+        print(f"value on index{ind}={newValue}.")
+        print("It would not take effect next time until time")
+        return True
 
 
 class FileH:
