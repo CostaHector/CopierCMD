@@ -8,7 +8,7 @@ a = Analysis(
     ['c:\\Users\\costa\\Documents\\python\\CopierCMD\\Copier.py'],
     pathex=[],
     binaries=[],
-    datas=[('bin/*', 'bin/')],
+    datas=[('bin', 'bin'), ('TextSaveTo', 'TextSaveTo')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

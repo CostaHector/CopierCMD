@@ -8,11 +8,12 @@ PROJECT_PATH = os.path.dirname(__file__)
 
 # os.environ["USERPROFILE"] if sys.platform == "win32" else os.environ["HOME"]
 
+JSON_FILE_PATH = os.path.join(PROJECT_PATH, "bin/PrefereceSetting.json")
+
 
 class MemoryKey(enum.Enum):
     TEXT_SAVE_TO_DEFAULT_PATH = os.path.join(PROJECT_PATH, "TextSaveTo")
     MONITORING_INTERVAL = 0.5
-    JSON_FILE_PATH = os.path.join(PROJECT_PATH, "bin/PrefereceSetting.json")
 
 
 g_memoryDict = {v.name: v.value for _, v in MemoryKey.__members__.items()}
@@ -20,7 +21,6 @@ g_memoryDict = {v.name: v.value for _, v in MemoryKey.__members__.items()}
 
 g_memoryCheckerFunc = {MemoryKey.TEXT_SAVE_TO_DEFAULT_PATH.name: lambda s: s and os.path.isdir(s),
                        MemoryKey.MONITORING_INTERVAL.name: lambda fval: 0.1 <= fval,  # min=0.1 sec
-                       MemoryKey.JSON_FILE_PATH.name: lambda s: s and os.path.isfile(s) and s.endswith(".json"),
                        }
 
 
@@ -125,7 +125,7 @@ class FileH:
         with open(file=absPath, mode="w", encoding="UTF-8") as fw:
             if _contents:
                 fw.write(_contents)
-        print(f"[File Create Succeed] [{absPath}]")
+        print(f"[File Created] [{absPath}]")
         return True
 
     @staticmethod
@@ -143,25 +143,23 @@ class FileH:
 
     @staticmethod
     def WriteIntoJsonFile() -> bool:
-        jsonPth = g_memoryDict[MemoryKey.JSON_FILE_PATH.name]
-        if not os.path.exists(jsonPth):
-            FileH.touchByAbsPath(jsonPth)
+        if not os.path.exists(JSON_FILE_PATH):
+            FileH.touchByAbsPath(JSON_FILE_PATH)
 
         if not FileH.CheckGMemDict(g_memoryDict):
             return False
 
-        with open(file=g_memoryDict[MemoryKey.JSON_FILE_PATH.name], mode="w", encoding="UTF-8") as f:
+        with open(file=JSON_FILE_PATH, mode="w", encoding="UTF-8") as f:
             json.dump(g_memoryDict, fp=f)
-        print("WriteIntoJsonFile")
 
     @staticmethod
     def ReadFromJsonFile():
-        if not os.path.isfile(g_memoryDict[MemoryKey.JSON_FILE_PATH.name]):
+        if not os.path.isfile(JSON_FILE_PATH):
             FileH.WriteIntoJsonFile()
             return
 
         k1 = g_memoryDict.keys()
-        with open(file=g_memoryDict[MemoryKey.JSON_FILE_PATH.name], mode="r", encoding="UTF-8") as f:
+        with open(file=JSON_FILE_PATH, mode="r", encoding="UTF-8") as f:
 
             recentMemoryDict: dict = json.load(fp=f)
             if not FileH.CheckGMemDict(recentMemoryDict):
