@@ -59,17 +59,8 @@ def main():
     textAbsPath = GetTextSaveToAbsPath()
     watcher = Copier(SaveToInTime, sleepTime, textAbsPath)
     watcher.start()
-
-    MemoryDictController.Display()
-    msg = "Input index|nvalue, exit(q) to quit\n"
-    hint = str()
-    while hint != 'q':
-        hint = input(msg)
-        inputLst = hint.split("|")
-        if len(inputLst) != 2:
-            print("input invalid, mod abort")
-            continue
-        setRet = MemoryDictController.SetValueInIndex(inputLst[0], inputLst[1])
+    memDictCon = MemoryDictController()
+    memDictCon()
     watcher.stop()
     FileH.WriteIntoJsonFile()
     print(f"Contents have write into [{textAbsPath}]. {WriteStat}")

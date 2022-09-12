@@ -1,4 +1,3 @@
-from curses.ascii import isdigit
 import os
 import sys
 import json
@@ -19,13 +18,40 @@ class MemoryKey(enum.Enum):
 g_memoryDict = {v.name: v.value for _, v in MemoryKey.__members__.items()}
 
 
+g_memoryCheckerFunc = {MemoryKey.TEXT_SAVE_TO_DEFAULT_PATH.name: lambda s: s and os.path.isdir(s),
+                       MemoryKey.MONITORING_INTERVAL.name: lambda fval: 0.1 <= fval,  # min=0.1 sec
+                       MemoryKey.JSON_FILE_PATH.name: lambda s: s and os.path.isfile(s) and s.endswith(".json"),
+                       }
+
+
 class MemoryDictController:
-    def Display():
+    QUIT_KEY = 'q'
+    SPLITTER_CHAR = '|'
+    PARM_COUNT = 2
+
+    def __call__(self):
+        self.Display()
+        inpt = str()
+        while inpt != MemoryDictController.QUIT_KEY:
+            inpt = input(self.inputMsg)
+            inputLst = inpt.split(MemoryDictController.SPLITTER_CHAR)
+            if len(inputLst) != MemoryDictController.PARM_COUNT:
+                print("input invalid, mod abort")
+                continue
+            setRet = MemoryDictController.SetValueInIndex(inputLst[0], inputLst[1])
+
+    def __init__(self):
+        self.inputMsg = f"Input index{MemoryDictController.SPLITTER_CHAR}nvalue,"
+        "exit({MemoryDictController.QUIT_KEY}) to quit\n"
+        self.listMsg = "{0}" + MemoryDictController.SPLITTER_CHAR + "{1}, [cur={2}, def={3}]"
+
+    def Display(self):
         i = 0
         for k, v in MemoryKey.__members__.items():
-            print(f"{i}. {k} {g_memoryDict[k]}|{v.value}")
+            print(self.listMsg.format(i, k, g_memoryDict[k], v.value))
             i += 1
 
+    @staticmethod
     def SetValueInIndex(ind: str, newValue: str) -> bool:
         if not ind.isnumeric():
             return False
@@ -50,6 +76,19 @@ class MemoryDictController:
 
 
 class FileH:
+
+    @staticmethod
+    def CheckGMemDict(gMemDict: dict) -> bool:
+        for k, v in MemoryKey.__members__.items():
+            pFunc = g_memoryCheckerFunc[k]
+            if k not in gMemDict:
+                return False
+            parm = gMemDict[k]
+            if not pFunc(parm):
+                print(f"{pFunc}({parm}) Check failed. Would Use Default Params")
+                return False
+        return True
+
     @staticmethod
     def IsDriveExist(_rootDir: str) -> bool:
         if sys.platform != "win32":  # Only windows sys have the drive
@@ -109,6 +148,9 @@ class FileH:
         if not os.path.exists(jsonPth):
             FileH.touchByAbsPath(jsonPth)
 
+        if not FileH.CheckGMemDict(g_memoryDict):
+            return False
+
         with open(file=g_memoryDict[MemoryKey.JSON_FILE_PATH.name], mode="w", encoding="UTF-8") as f:
             json.dump(g_memoryDict, fp=f)
         print("WriteIntoJsonFile")
@@ -118,19 +160,21 @@ class FileH:
         if not os.path.isfile(g_memoryDict[MemoryKey.JSON_FILE_PATH.name]):
             FileH.WriteIntoJsonFile()
             return
-        try:
-            k1 = g_memoryDict.keys()
-            with open(file=g_memoryDict[MemoryKey.JSON_FILE_PATH.name], mode="r", encoding="UTF-8") as f:
-                recentMemoryDict: dict = json.load(fp=f)
-                k2 = recentMemoryDict.keys()
-                if k1 != k2:
-                    FileH.WriteIntoJsonFile()
-                    return
-                for k, v in recentMemoryDict.items():
-                    g_memoryDict[k] = v
-        except json.JSONDecodeError:
-            FileH.WriteIntoJsonFile()
-        return
+
+        k1 = g_memoryDict.keys()
+        with open(file=g_memoryDict[MemoryKey.JSON_FILE_PATH.name], mode="r", encoding="UTF-8") as f:
+
+            recentMemoryDict: dict = json.load(fp=f)
+            if not FileH.CheckGMemDict(recentMemoryDict):
+                FileH.WriteIntoJsonFile()
+                return
+
+            k2 = recentMemoryDict.keys()
+            if k1 != k2:
+                FileH.WriteIntoJsonFile()
+                return
+            for k, v in recentMemoryDict.items():
+                g_memoryDict[k] = v
 
 
 if __name__ == "__main__":
