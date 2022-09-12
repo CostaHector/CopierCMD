@@ -4,24 +4,22 @@ import json
 import enum
 import time
 
-PROJECT_PATH = os.path.dirname(__file__)
 
 # os.environ["USERPROFILE"] if sys.platform == "win32" else os.environ["HOME"]
+PROJECT_PATH = os.path.dirname(__file__)
+
 
 JSON_FILE_PATH = os.path.join(PROJECT_PATH, "bin/PrefereceSetting.json")
 
 
 class MemoryKey(enum.Enum):
-    TEXT_SAVE_TO_DEFAULT_PATH = os.path.join(PROJECT_PATH, "TextSaveTo")
-    MONITORING_INTERVAL = 0.5
+    TEXT_SAVE_TO_DEFAULT_PATH = {'v': os.path.join(PROJECT_PATH, "TextSaveTo"), 'id': 0,
+                                 'checker': lambda s: s and os.path.isdir(s)}
+    MONITORING_INTERVAL = {'v': 0.5, 'id': 1,
+                           'checker': lambda f: 0.1 <= f}
 
 
-g_memoryDict = {v.name: v.value for _, v in MemoryKey.__members__.items()}
-
-
-g_memoryCheckerFunc = {MemoryKey.TEXT_SAVE_TO_DEFAULT_PATH.name: lambda s: s and os.path.isdir(s),
-                       MemoryKey.MONITORING_INTERVAL.name: lambda fval: 0.1 <= fval,  # min=0.1 sec
-                       }
+g_memoryDict = {v.name: v.value['v'] for _, v in MemoryKey.__members__.items()}
 
 
 class MemoryDictController:
@@ -47,7 +45,7 @@ class MemoryDictController:
     def Display(self):
         i = 0
         for k, v in MemoryKey.__members__.items():
-            print(self.listMsg.format(i, k, g_memoryDict[k], v.value))
+            print(self.listMsg.format(i, k, g_memoryDict[k], v.value['v']))
             i += 1
 
     @staticmethod
@@ -79,12 +77,12 @@ class FileH:
     @staticmethod
     def CheckGMemDict(gMemDict: dict) -> bool:
         for k, v in MemoryKey.__members__.items():
-            pFunc = g_memoryCheckerFunc[k]
+            pFunc = v.value['checker']
             if k not in gMemDict:
                 return False
             parm = gMemDict[k]
             if not pFunc(parm):
-                print(f"{pFunc}({parm}) Check failed. Would Use Default Params")
+                print(f"{k}, {pFunc}({parm}) Check failed. Would Use Default Params")
                 return False
         return True
 
@@ -105,7 +103,6 @@ class FileH:
     @staticmethod
     def MakeDir(p: str):
         if os.path.exists(p):
-            print(f"[Dir already exist] [{p}]")
             return
         print(f"[Dir make] [{p}]")
         os.makedirs(p)
@@ -175,5 +172,5 @@ class FileH:
 
 
 if __name__ == "__main__":
-    print("Hello world")
-    print({1, 2} == {2, 1})
+    if not FileH.CheckGMemDict(g_memoryDict):
+        print("checked failed")
