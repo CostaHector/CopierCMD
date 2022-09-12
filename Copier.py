@@ -63,7 +63,10 @@ def main():
     memDictCon()
     watcher.stop()
     FileH.WriteIntoJsonFile()
+    
     print(f"Contents have write into [{textAbsPath}]. {WriteStat}")
+    print("Program will quit within 5 seconds")
+    time.sleep(5)
 
 
 if __name__ == "__main__":
