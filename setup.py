@@ -31,7 +31,7 @@ class Setup:
         self.mainPyScript = os.path.join(PROJECT_PATH, "Copier.py")
         self.specpath = PROJECT_PATH
         self.appIconPath = str()
-        self.addData = ("bin/*;bin/",)
+        self.addData = ("bin;bin","TextSaveTo;TextSaveTo")
 
         self.workpath = os.path.join(PROJECT_PATH, "build")
         self.distpath = os.path.join(PROJECT_PATH, "dist")
