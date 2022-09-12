@@ -5,3 +5,6 @@ TextSaveTo
 build
 
 dist
+
+Pipfile
+Pipfile.lock

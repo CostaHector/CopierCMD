@@ -3,16 +3,20 @@
 > find the pythonx.exe path
 
 - For Linux
-or `whereis python`
+  - `whereis python`
 
 - For Win
-in vscode `ctrl+shift+P`, select `interpreter`, e.g., `C:\Users\l00613497\AppData\Local\Programs\Python\Python310`
-or `python -m site`
-
+  - `where python`
+  - `python -m site`
+  - in vscode `ctrl+shift+P`, select `interpreter`, e.g., `C:\Users\l00613497\AppData\Local\Programs\Python\Python310`
 ```sh
 cd C:\Users\l00613497\AppData\Local\Programs\Python\Python310
 ./python.exe -m pip list
 ./python.exe -m pip install pyinstaller
+# or in win
+.\\python.exe -m pip list
+.\\python.exe -m pip install pyinstaller
+
 cd C:\Users\l00613497\AppData\Local\Programs\Python\Python310\Scripts
 ./pyinstaller.exe --onedir "D:\Markdown\Learning\TaskMD5\MD5Manager.py" --specpath="D:\Markdown\Learning\TaskMD5" --workpath="D:\Markdown\Learning\TaskMD5\build" --distpath="D:\Markdown\Learning\TaskMD5\dist"
 ```
@@ -23,8 +27,11 @@ cd C:\Users\l00613497\AppData\Local\Programs\Python\Python310\Scripts
 .spec -> Analysis -> excludes, to exclude some packages manually
 - Method 2: virtual env
 ```sh
-.\python.exe -m pip install pipenv
-# go to a specified path
+./python.exe -m pip install pipenv
+# or in win
+.\\python.exe -m pip install pipenv
+
+# go to a specified path, e.g. C:\Users\costa\Documents\python\CopierCMD
 cd /path/you/specified/to/generate/env
 pipenv install
 ```
@@ -77,12 +84,31 @@ now Pipfile created in current folder
 
 ```sh
 pipenv shell
+# rememeber here pip and python is in pipenv, so python3.x is not essential, execute it to find the dependency
+python xxx.py
 pip list
-# rememeber here pip is in pipenv, so python3.x is not essential
-# copy the essential package from local downloaded package
+
+# to meet the dependency copy the essential package from local downloaded package 
 pip install xxx
 # or from internet
 pip install xxx -i https://pypi.tuna.tsinghua.edu.cn/simple
 # gen exe
 C:\Users\l00613497\AppData\Local\Programs\Python\Python310\Scripts\pyinstaller.exe --onedir "D:\Markdown\Learning\TaskMD5\MD5Manager.py" --specpath="D:\Markdown\Learning\TaskMD5" --workpath="D:\Markdown\Learning\TaskMD5\build" --distpath="D:\Markdown\Learning\TaskMD5\dist"
+```
+
+e.g.
+```sh
+(CopierCMD-HUFoCig3) C:\Users\costa\Documents\python\CopierCMD>python Copier.py
+Traceback (most recent call last):
+  File "C:\Users\costa\Documents\python\CopierCMD\Copier.py", line 6, in <module>
+    import pyperclip
+ModuleNotFoundError: No module named 'pyperclip'
+
+(CopierCMD-HUFoCig3) C:\Users\costa\Documents\python\CopierCMD>pip install pyperclip
+Collecting pyperclip
+  Using cached pyperclip-1.8.2-py3-none-any.whl
+Installing collected packages: pyperclip
+Successfully installed pyperclip-1.8.2
+
+C:\Users\costa\AppData\Local\Programs\Python\Python310\Scripts\pyinstaller.exe ...
 ```
