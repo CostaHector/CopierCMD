@@ -41,8 +41,7 @@ class MemoryDictController:
             setRet = MemoryDictController.SetValueInIndex(inputLst[0], inputLst[1])
 
     def __init__(self):
-        self.inputMsg = f"Input index{MemoryDictController.SPLITTER_CHAR}nvalue,"
-        "exit({MemoryDictController.QUIT_KEY}) to quit\n"
+        self.inputMsg = f"Input index{MemoryDictController.SPLITTER_CHAR}nvalue, press({MemoryDictController.QUIT_KEY}) to quit\n"
         self.listMsg = "{0}" + MemoryDictController.SPLITTER_CHAR + "{1}, [cur={2}, def={3}]"
 
     def Display(self):
