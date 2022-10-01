@@ -6,7 +6,6 @@ import threading
 import pyperclip
 from PublicTools import FileH, MemoryKey, g_memoryDict, MemoryDictController
 
-
 class Copier(threading.Thread):
     def __init__(self, callback, pause, textSaveTo):
         super(Copier, self).__init__()
@@ -19,7 +18,7 @@ class Copier(threading.Thread):
         recent_value = ""
         while not self._stopping:
             time.sleep(self._pause)
-            tmp_value = pyperclip.paste()
+            tmp_value = pyperclip.paste().replace('\r\n','\n')
             if tmp_value == recent_value:
                 continue
             recent_value = tmp_value
