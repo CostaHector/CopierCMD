@@ -80,7 +80,7 @@ To activate this project's virtualenv, run pipenv shell.
 Alternatively, run a command inside the virtualenv with pipenv run.
 ```
 
-now Pipfile created in current folder
+now Pipfile created in current folder, everytime you need to execute pipenv shell, and choose interpreter
 
 ```sh
 pipenv shell
