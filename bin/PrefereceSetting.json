@@ -1,1 +1,4 @@
-{"TEXT_SAVE_TO_DEFAULT_PATH": "c:\\Users\\costa\\Documents\\python\\CopierCMD\\TextSaveTo", "MONITORING_INTERVAL": 0.5}
+{
+    "TEXT_SAVE_TO_DEFAULT_PATH": "c:\\Users\\costa\\Documents\\python\\CopierCMD\\TextSaveTo",
+    "MONITORING_INTERVAL": 0.5
+}

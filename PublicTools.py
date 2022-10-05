@@ -34,8 +34,12 @@ class MemoryDictController:
             inpt = input(self.inputMsg)
             inputLst = inpt.split(MemoryDictController.SPLITTER_CHAR)
             if len(inputLst) != MemoryDictController.PARM_COUNT:
-                print("input invalid, mod abort")
-                continue
+                if inpt == MemoryDictController.QUIT_KEY:
+                    print("quit")    
+                    break
+                else:
+                    print("input invalid, mod abort")
+                    continue
             setRet = MemoryDictController.SetValueInIndex(inputLst[0], inputLst[1])
 
     def __init__(self):
